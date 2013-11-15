@@ -74,4 +74,17 @@ Once again refer to the official [documentation](https://github.com/lexik/LexikT
 
 ## Usage
 
-Include the bundle and it will show up in the admin panel. There really is not more to say about it ;).
+To include the bundle in the admin dashboard, add group "group.translation" to dashboard
+
+```
+# app/config/config.yml
+sonata_admin:
+    dashboard:
+        groups:
+            group.translation:
+                label: Translation
+                items: ~ 
+```
+
+
+ There really is not more to say about it ;).
