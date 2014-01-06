@@ -8,9 +8,27 @@ class ORMTranslationAdmin extends TranslationAdmin
 {
     protected function configureDatagridFilters(DatagridMapper $filter)
     {
-        $filter
-            ->add('key', 'doctrine_orm_string')
-            ->add('domain', 'doctrine_orm_string')
+
+    	$em = $this->getConfigurationPool()->getContainer()->get('doctrine')->getEntityManagerForClass('Lexik\Bundle\TranslationBundle\Entity\File');
+    	$repo = $em->getRepository('Lexik\Bundle\TranslationBundle\Entity\File');
+    	foreach($repo->findAll() as $file){
+    		/* @var $file  \Lexik\Bundle\TranslationBundle\Entity\File */
+    		$domains[$file->getDomain()] = $file->getDomain();
+    	}
+    	ksort($domains);
+    	$filter
+	    	->add('key', 'doctrine_orm_string')
+	    	->add('domain', 'doctrine_orm_choice', array(
+	    			'field_options'=> array(
+	    					'choices' => $domains,
+	    					'required' => true,
+	    					'multiple' => false,
+	    					'expanded' => false,
+	    					'empty_value' => 'messages',
+	    					'empty_data'  => 'messages'
+	    			),
+	    			'field_type'=> 'choice',
+	    	))
             ->add('content', 'doctrine_orm_callback',
                 array
                 (
