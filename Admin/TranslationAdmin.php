@@ -123,6 +123,12 @@ abstract class TranslationAdmin extends Admin
      */
     protected function configureFormFields(FormMapper $form)
     {
+        $subject = $this->getSubject();
+
+        if(null === $subject->getId()) {
+            $subject->setDomain($this->getDefaultDomain());
+        }
+
         $form
             ->add('key', 'text')
             ->add('domain', 'text')
