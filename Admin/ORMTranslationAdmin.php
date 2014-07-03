@@ -9,7 +9,7 @@ class ORMTranslationAdmin extends TranslationAdmin
 {
     protected function configureDatagridFilters(DatagridMapper $filter)
     {
-    	$em = $this->getConfigurationPool()->getContainer()->get('doctrine')->getManagerForClass('Lexik\Bundle\TranslationBundle\Entity\File');
+    	$em = $this->getContainer()->get('doctrine')->getManagerForClass('Lexik\Bundle\TranslationBundle\Entity\File');
     	$repo = $em->getRepository('Lexik\Bundle\TranslationBundle\Entity\File');
 
         $domains = array();
@@ -29,8 +29,8 @@ class ORMTranslationAdmin extends TranslationAdmin
 	    					'required' => true,
 	    					'multiple' => false,
 	    					'expanded' => false,
-	    					'empty_value' => 'messages',
-	    					'empty_data'  => 'messages'
+	    					'empty_value' => $this->getDefaultDomain(),
+	    					'empty_data'  => $this->getDefaultDomain()
 	    			),
 	    			'field_type'=> 'choice',
 	    	))

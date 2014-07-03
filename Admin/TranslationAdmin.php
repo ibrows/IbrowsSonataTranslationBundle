@@ -8,6 +8,7 @@ use Sonata\AdminBundle\Model\ModelManagerInterface;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Admin\Admin;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class TranslationAdmin extends Admin
 {
@@ -51,7 +52,7 @@ abstract class TranslationAdmin extends Admin
     {
         $this->datagridValues = array_merge(array(
                 'domain' => array(
-                    'value' => 'messages',
+                    'value' => $this->getDefaultDomain(),
                 )
             ),
             $this->datagridValues
@@ -126,5 +127,21 @@ abstract class TranslationAdmin extends Admin
             ->add('key', 'text')
             ->add('domain', 'text')
         ;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer()
+    {
+        return $this->getConfigurationPool()->getContainer();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultDomain()
+    {
+        return $this->getContainer()->getParameter('ibrows_sonata_translation.defaultDomain');
     }
 }

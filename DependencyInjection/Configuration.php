@@ -28,18 +28,19 @@ class Configuration implements ConfigurationInterface
     
     protected function addEditableSection(ArrayNodeDefinition $node)
     {
-    		$node
-    			->children()
-		    		->arrayNode('editable')
-			    		->addDefaultsIfNotSet()
-			    		->children()
-				    		->scalarNode('mode')->defaultValue('inline')->end()
-				    		->scalarNode('type')->defaultValue('textarea')->end()
-				    		->scalarNode('emptytext')->defaultValue('Empty')->end()
-				    		->scalarNode('placement')->defaultValue('top')->end()
-			    		->end()
-		    		->end()
-	    		->end()
-    		;
+        $node
+            ->children()
+                ->scalarNode('defaultDomain')->defaultValue('messages')->end()
+                ->arrayNode('editable')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('mode')->defaultValue('inline')->end()
+                        ->scalarNode('type')->defaultValue('textarea')->end()
+                        ->scalarNode('emptytext')->defaultValue('Empty')->end()
+                        ->scalarNode('placement')->defaultValue('top')->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
     }
 }
