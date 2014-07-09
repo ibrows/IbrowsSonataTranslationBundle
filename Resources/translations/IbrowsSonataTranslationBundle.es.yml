@@ -1,0 +1,8 @@
+group:
+  translation: Traducciones
+  
+translation:
+  title:  Traducciones
+  
+action:
+  clear_cache: Borrar caché
