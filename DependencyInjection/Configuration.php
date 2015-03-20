@@ -34,7 +34,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('editable')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('mode')->defaultValue('inline')->end()
+                        ->scalarNode('mode')->defaultValue('popup')->end()
                         ->scalarNode('type')->defaultValue('textarea')->end()
                         ->scalarNode('emptytext')->defaultValue('Empty')->end()
                         ->scalarNode('placement')->defaultValue('top')->end()
