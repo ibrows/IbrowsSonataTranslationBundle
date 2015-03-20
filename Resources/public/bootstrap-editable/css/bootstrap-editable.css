@@ -18,6 +18,8 @@
 */
 .editableform .form-control {
     width: auto;
+
+    min-width: 540px;
 }
 
 .editable-buttons {

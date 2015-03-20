@@ -34,6 +34,7 @@ file that was distributed with this source code.
         placement: "{{ options.placement }}",
         url: {{ admin.generateObjectUrl(field_description.options.route.name, object, field_description.options.route.parameters)|json_encode|raw }},
         name: {{ object.key|json_encode|raw }},
+        rows: 1,
         params: function(params) {
             // make sure pk is always loaded from element
             params.pk = jQuery(this).attr('data-pk');
