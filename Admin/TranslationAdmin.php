@@ -22,11 +22,21 @@ abstract class TranslationAdmin extends Admin
     protected $editableOptions;
 
     /**
+     * @var array
+     */
+    protected $defaultSelections = array();
+
+    /**
+     * @var array
+     */
+    protected $emptyFieldPrefixes = array();
+
+    /**
      * @param array $options
      */
     public function setEditableOptions(array $options)
     {
-	    	$this->editableOptions = $options;
+        $this->editableOptions = $options;
     }
 
     /**
@@ -48,19 +58,77 @@ abstract class TranslationAdmin extends Admin
     /**
      * @return array
      */
+    public function getEmptyFieldPrefixes()
+    {
+        return $this->emptyFieldPrefixes;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDefaultSelections()
+    {
+        return $this->defaultSelections;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFilteredLanguages()
+    {
+        $languages = array();
+        array_walk_recursive(
+            $this->defaultSelections['languages'],
+            function ($language) use (&$languages) {
+                $languages[$language] = $language;
+            }
+        );
+
+        return $languages;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNonTranslatedOnly()
+    {
+        return array_key_exists('nonTranslatedOnly', $this->getDefaultSelections()) && (bool) $this->defaultSelections['nonTranslatedOnly'];
+    }
+
+    /**
+     * @param array $selections
+     */
+    public function setDefaultSelections(array $selections)
+    {
+        $this->defaultSelections = $selections;
+    }
+
+    /**
+     * @param array $prefixes
+     */
+    public function setEmptyPrefixes(array $prefixes)
+    {
+        $this->emptyFieldPrefixes = $prefixes;
+    }
+
+    /**
+     * @return array
+     */
     public function getFilterParameters()
     {
-        $this->datagridValues = array_merge(array(
+        $this->datagridValues = array_merge(
+            array(
                 'domain' => array(
                     'value' => $this->getDefaultDomain(),
-                )
+                ),
             ),
             $this->datagridValues
 
         );
+
         return parent::getFilterParameters();
     }
-    
+
     /**
      * @param unknown $name
      * @return multitype:|NULL
@@ -70,11 +138,11 @@ abstract class TranslationAdmin extends Admin
         if ($name === 'layout') {
             return 'IbrowsSonataTranslationBundle::translation_layout.html.twig';
         }
-        
+
         if ($name === 'list') {
             return 'IbrowsSonataTranslationBundle:CRUD:list.html.twig';
         }
-        
+
         return parent::getTemplate($name);
     }
 
@@ -94,8 +162,7 @@ abstract class TranslationAdmin extends Admin
     {
         $collection
             ->add('clear_cache')
-            ->add('create_trans_unit')
-        ;
+            ->add('create_trans_unit');
     }
 
     /**
@@ -106,12 +173,13 @@ abstract class TranslationAdmin extends Admin
         $list
             ->add('id', 'integer')
             ->add('key', 'string')
-            ->add('domain', 'string')
-        ;
-        
+            ->add('domain', 'string');
+
         foreach ($this->managedLocales as $locale) {
             $fieldDescription = $this->modelManager->getNewFieldDescriptionInstance($this->getClass(), $locale);
-            $fieldDescription->setTemplate('IbrowsSonataTranslationBundle:CRUD:base_inline_translation_field.html.twig');
+            $fieldDescription->setTemplate(
+                'IbrowsSonataTranslationBundle:CRUD:base_inline_translation_field.html.twig'
+            );
             $fieldDescription->setOption('locale', $locale);
             $fieldDescription->setOption('editable', $this->editableOptions);
             $list->add($fieldDescription);
@@ -125,14 +193,13 @@ abstract class TranslationAdmin extends Admin
     {
         $subject = $this->getSubject();
 
-        if(null === $subject->getId()) {
+        if (null === $subject->getId()) {
             $subject->setDomain($this->getDefaultDomain());
         }
 
         $form
             ->add('key', 'text')
-            ->add('domain', 'text')
-        ;
+            ->add('domain', 'text');
     }
 
     /**

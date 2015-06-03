@@ -6,3 +6,5 @@ translation:
   
 action:
   clear_cache: Clear Cache
+
+show_non_translated_only: "Mostrar sólo las teclas que no traducidas"

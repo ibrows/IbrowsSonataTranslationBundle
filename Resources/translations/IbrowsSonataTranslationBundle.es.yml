@@ -6,3 +6,5 @@ translation:
   
 action:
   clear_cache: Borrar caché
+
+show_non_translated_only: "Montrer non seulement traduit"
