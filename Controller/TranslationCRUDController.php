@@ -2,7 +2,7 @@
 
 namespace Ibrows\SonataTranslationBundle\Controller;
 
-use Saxulum\HttpClient\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -11,8 +11,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TranslationCRUDController extends CRUDController
 {
-
-
     /**
      * Edit action
      *

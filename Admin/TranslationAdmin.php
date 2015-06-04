@@ -32,6 +32,16 @@ abstract class TranslationAdmin extends Admin
     protected $emptyFieldPrefixes = array();
 
     /**
+     * @var array
+     */
+    protected $filterLocales = array();
+
+    /**
+     * @var array
+     */
+    protected $managedLocales = array();
+
+    /**
      * @param array $options
      */
     public function setEditableOptions(array $options)
@@ -50,7 +60,7 @@ abstract class TranslationAdmin extends Admin
     /**
      * @param array $managedLocales
      */
-    public function setManagedLocales($managedLocales)
+    public function setManagedLocales(array $managedLocales)
     {
         $this->managedLocales = $managedLocales;
     }
@@ -71,21 +81,6 @@ abstract class TranslationAdmin extends Admin
         return $this->defaultSelections;
     }
 
-    /**
-     * @return array
-     */
-    public function getFilteredLanguages()
-    {
-        $languages = array();
-        array_walk_recursive(
-            $this->defaultSelections['languages'],
-            function ($language) use (&$languages) {
-                $languages[$language] = $language;
-            }
-        );
-
-        return $languages;
-    }
 
     /**
      * @return array
@@ -175,7 +170,9 @@ abstract class TranslationAdmin extends Admin
             ->add('key', 'string')
             ->add('domain', 'string');
 
-        foreach ($this->managedLocales as $locale) {
+        $localesToShow = count($this->filterLocales) > 0 ? $this->filterLocales : $this->managedLocales;
+
+        foreach ($localesToShow as $locale) {
             $fieldDescription = $this->modelManager->getNewFieldDescriptionInstance($this->getClass(), $locale);
             $fieldDescription->setTemplate(
                 'IbrowsSonataTranslationBundle:CRUD:base_inline_translation_field.html.twig'
@@ -184,6 +181,25 @@ abstract class TranslationAdmin extends Admin
             $fieldDescription->setOption('editable', $this->editableOptions);
             $list->add($fieldDescription);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildDatagrid()
+    {
+        if ($this->datagrid) {
+            return;
+        }
+
+        $filterParameters = $this->getFilterParameters();
+
+        // transform _sort_by from a string to a FieldDescriptionInterface for the datagrid.
+        if (isset($filterParameters['locale']) && is_array($filterParameters['locale'])) {
+            $this->filterLocales = $filterParameters['locale']['value'];
+        }
+
+        parent::buildDatagrid();
     }
 
     /**

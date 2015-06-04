@@ -36,7 +36,7 @@ class ORMTranslationAdmin extends TranslationAdmin
                 (
                     'callback' => function (ProxyQuery $queryBuilder, $alias, $field, $options) {
                         /* @var $queryBuilder \Doctrine\ORM\QueryBuilder */
-                        if (!isset($options['value']) || !$options['value'] || false === $options['value']) {
+                        if (!isset($options['value']) || empty($options['value']) || false === $options['value']) {
                             return;
                         }
                         $this->joinTranslations($queryBuilder, $alias);
@@ -66,15 +66,16 @@ class ORMTranslationAdmin extends TranslationAdmin
                 array(
                     'callback' => function (ProxyQuery $queryBuilder, $alias, $field, $options) {
                         /* @var $queryBuilder \Doctrine\ORM\QueryBuilder */
-                        if (!isset($options['value']) || !$options['value']) {
+                        if (!isset($options['value']) || empty($options['value'])) {
                             return;
                         }
+
                         $this->joinTranslations($queryBuilder, $alias);
-                        $queryBuilder->andWhere('translations.content IN (:languages)')
-                            ->setParameter('languages', $options['value']);
+                        $queryBuilder->andWhere('translations.locale IN (:locales)')
+                            ->setParameter('locales', $options['value']);
                     },
                     'field_options' => array(
-                        'choices' => $this->getFilteredLanguages(),
+                        'choices' => $this->formatLocales($this->managedLocales),
                         'required' => false,
                         'multiple' => true,
                         'expanded' => false
@@ -105,7 +106,7 @@ class ORMTranslationAdmin extends TranslationAdmin
                 (
                     'callback' => function (ProxyQuery $queryBuilder, $alias, $field, $options) {
                         /* @var $queryBuilder \Doctrine\ORM\QueryBuilder */
-                        if (!isset($options['value']) || !$options['value']) {
+                        if (!isset($options['value']) || empty($options['value'])) {
                             return;
                         }
                         $this->joinTranslations($queryBuilder, $alias);
@@ -139,5 +140,21 @@ class ORMTranslationAdmin extends TranslationAdmin
         if (!$alreadyJoined) {
             $queryBuilder->innerJoin(sprintf('%s.translations', $alias), 'translations');
         }
+    }
+
+    /**
+     * @return array
+     */
+    private function formatLocales(array $locales)
+    {
+        $formattedLocales = array();
+        array_walk_recursive(
+            $locales,
+            function ($language) use (&$formattedLocales) {
+                $formattedLocales[$language] = $language;
+            }
+        );
+
+        return $formattedLocales;
     }
 }
