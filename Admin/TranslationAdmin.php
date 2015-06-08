@@ -196,7 +196,7 @@ abstract class TranslationAdmin extends Admin
 
         // transform _sort_by from a string to a FieldDescriptionInterface for the datagrid.
         if (isset($filterParameters['locale']) && is_array($filterParameters['locale'])) {
-            $this->filterLocales = $filterParameters['locale']['value'];
+            $this->filterLocales = array_key_exists('value', $filterParameters['locale']) ? $filterParameters['locale']['value'] : $this->managedLocales;
         }
 
         parent::buildDatagrid();
