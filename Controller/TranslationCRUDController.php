@@ -2,6 +2,7 @@
 
 namespace Ibrows\SonataTranslationBundle\Controller;
 
+use Ibrows\SonataTranslationBundle\Event\RemoveLocaleCacheEvent;
 use Symfony\Component\HttpFoundation\Response;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
@@ -128,8 +129,9 @@ class TranslationCRUDController extends CRUDController
 
     public function clearCacheAction()
     {
-
+        $this->get('event_dispatcher')->dispatch(RemoveLocaleCacheEvent::PRE_REMOVE_LOCAL_CACHE, new RemoveLocaleCacheEvent($this->getManagedLocales()));
         $this->get('translator')->removeLocalesCacheFiles($this->getManagedLocales());
+        $this->get('event_dispatcher')->dispatch(RemoveLocaleCacheEvent::POST_REMOVE_LOCAL_CACHE, new RemoveLocaleCacheEvent($this->getManagedLocales()));
 
         /** @var $session Session */
         $session = $this->get('session');
