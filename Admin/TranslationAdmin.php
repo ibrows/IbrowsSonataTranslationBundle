@@ -233,4 +233,18 @@ abstract class TranslationAdmin extends Admin
     {
         return $this->getContainer()->getParameter('ibrows_sonata_translation.defaultDomain');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBatchActions()
+    {
+        $actions = parent::getBatchActions();
+        $actions['download'] = array(
+            'label'            => $this->trans($this->getLabelTranslatorStrategy()->getLabel('download', 'batch', 'IbrowsSonataTranslationBundle')),
+            'ask_confirmation' => false,
+        );
+
+        return $actions;
+    }
 }

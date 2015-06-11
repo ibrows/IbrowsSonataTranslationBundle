@@ -2,13 +2,20 @@
 
 namespace Ibrows\SonataTranslationBundle\Controller;
 
+use Doctrine\DBAL\DBALException;
 use Ibrows\SonataTranslationBundle\Event\RemoveLocaleCacheEvent;
+use Lexik\Bundle\TranslationBundle\Entity\TransUnit;
+use Lexik\Bundle\TranslationBundle\Manager\TranslationInterface;
+use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Yaml\Dumper;
 
 class TranslationCRUDController extends CRUDController
 {
@@ -41,7 +48,7 @@ class TranslationCRUDController extends CRUDController
         if (false === $this->admin->isGranted('EDIT', $transUnit)) {
             return $this->renderJson(
                 array(
-                    'message' => 'access denied'
+                    'message' => 'access denied',
                 ),
                 403
             );
@@ -60,7 +67,7 @@ class TranslationCRUDController extends CRUDController
         if (!$locale) {
             return $this->renderJson(
                 array(
-                    'message' => 'locale missing'
+                    'message' => 'locale missing',
                 ),
                 422
             );
@@ -79,15 +86,18 @@ class TranslationCRUDController extends CRUDController
 
         return $this->renderJson(
             array(
-                'key'    => $transUnit->getKey(),
+                'key' => $transUnit->getKey(),
                 'domain' => $transUnit->getDomain(),
-                'pk'     => $translation->getId(),
+                'pk' => $translation->getId(),
                 'locale' => $translation->getLocale(),
-                'value'  => $translation->getContent()
+                'value' => $translation->getContent(),
             )
         );
     }
 
+    /**
+     * @return RedirectResponse|Response
+     */
     public function createTransUnitAction()
     {
         $request = $this->getRequest();
@@ -95,7 +105,7 @@ class TranslationCRUDController extends CRUDController
         if (!$request->isMethod('POST')) {
             return $this->renderJson(
                 array(
-                    'message' => 'method not allowed'
+                    'message' => 'method not allowed',
                 ),
                 403
             );
@@ -104,7 +114,7 @@ class TranslationCRUDController extends CRUDController
         if (false === $admin->isGranted('EDIT')) {
             return $this->renderJson(
                 array(
-                    'message' => 'access denied'
+                    'message' => 'access denied',
                 ),
                 403
             );
@@ -114,7 +124,7 @@ class TranslationCRUDController extends CRUDController
         if (!$keyName || !$domainName) {
             return $this->renderJson(
                 array(
-                    'message' => 'missing key or domain'
+                    'message' => 'missing key or domain',
                 ),
                 422
             );
@@ -127,11 +137,20 @@ class TranslationCRUDController extends CRUDController
         return $this->editAction($transUnit->getId());
     }
 
+    /**
+     * @return RedirectResponse
+     */
     public function clearCacheAction()
     {
-        $this->get('event_dispatcher')->dispatch(RemoveLocaleCacheEvent::PRE_REMOVE_LOCAL_CACHE, new RemoveLocaleCacheEvent($this->getManagedLocales()));
+        $this->get('event_dispatcher')->dispatch(
+            RemoveLocaleCacheEvent::PRE_REMOVE_LOCAL_CACHE,
+            new RemoveLocaleCacheEvent($this->getManagedLocales())
+        );
         $this->get('translator')->removeLocalesCacheFiles($this->getManagedLocales());
-        $this->get('event_dispatcher')->dispatch(RemoveLocaleCacheEvent::POST_REMOVE_LOCAL_CACHE, new RemoveLocaleCacheEvent($this->getManagedLocales()));
+        $this->get('event_dispatcher')->dispatch(
+            RemoveLocaleCacheEvent::POST_REMOVE_LOCAL_CACHE,
+            new RemoveLocaleCacheEvent($this->getManagedLocales())
+        );
 
         /** @var $session Session */
         $session = $this->get('session');
@@ -139,6 +158,64 @@ class TranslationCRUDController extends CRUDController
 
         return $this->redirect($this->admin->generateUrl('list'));
     }
+
+    /**
+     * Execute a batch download
+     *
+     * @param ProxyQueryInterface $query
+     *
+     * @return RedirectResponse
+     */
+    public function batchActionDownload(ProxyQueryInterface $queryProxy)
+    {
+        $flashType = 'success';
+
+        $dumper = new Dumper();
+        $dumper->setIndentation(4);
+
+        $response = new StreamedResponse(
+            function () use ($queryProxy, &$flashType, $dumper) {
+                try {
+                    /**
+                     * @var TransUnit $transUnit
+                     */
+                    foreach ($queryProxy->getQuery()->iterate() as $pos => $object) {
+                        foreach ($object as $transUnit) {
+                            $chunkPrefix = $transUnit->getDomain() . '__' . $transUnit->getKey() . '__' . $transUnit->getId() . '__';
+                            $chunk = array();
+                            /** @var TranslationInterface $translation */
+                            foreach ($transUnit->getTranslations() as $translation) {
+                                $chunk[$chunkPrefix.$translation->getLocale()] = $translation->getContent();
+                            }
+                            echo $dumper->dump($chunk, 2);
+                            flush();
+                        }
+                    }
+                } catch (\PDOException $e) {
+                    $flashType = 'error';
+                    flush();
+                } catch (DBALException $e) {
+                    $flashType = 'error';
+                    flush();
+                }
+            }
+        );
+
+        $this->addFlash('sonata_flash_'.$flashType, 'translations.flash_batch_download_'.$flashType);
+
+        $response->headers->set('Content-Type', 'text/x-yaml');
+        $response->headers->set('Cache-Control', '');
+        $response->headers->set('Transfer-Encoding', 'chunked');
+        $response->headers->set('Last-Modified', gmdate('D, d M Y H:i:s'));
+        $contentDisposition = $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            'translations.yml'
+        );
+        $response->headers->set('Content-Disposition', $contentDisposition);
+
+        return $response;
+    }
+
 
     protected function getManagedLocales()
     {

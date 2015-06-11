@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                                      http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="Ibrows\SonataTranslationBundle\Entity\TranslationFile"
+            table="ibrows_translation_file"
+            repository-class="Ibrows\SonataTranslationBundle\Entity\TranslationFileRepository">
+
+        <lifecycle-callbacks>
+            <lifecycle-callback type="prePersist" method="lifecycleFileUpload" />
+        </lifecycle-callbacks>
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO" />
+        </id>
+
+        <field name="createdAt" type="datetime" column="created_at" nullable="false" />
+        <field name="filename" column="filename" type="string" length="255" />
+    </entity>
+</doctrine-mapping>

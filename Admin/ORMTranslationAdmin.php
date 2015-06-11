@@ -9,6 +9,7 @@ use Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQuery;
 
 class ORMTranslationAdmin extends TranslationAdmin
 {
+
     protected function configureDatagridFilters(DatagridMapper $filter)
     {
         /** @var \Doctrine\ORM\EntityManager $em */

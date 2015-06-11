@@ -6,5 +6,9 @@ translation:
   
 action:
   clear_cache: Clear Cache
+  upload: Upload Translationfile
 
-show_non_translated_only: "Mostrar sólo las teclas que no traducidas"
+show_non_translated_only: "Shown non translated only"
+
+batch:
+  download: 'Download'
