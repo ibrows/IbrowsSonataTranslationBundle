@@ -6,3 +6,9 @@ translation:
   
 action:
   clear_cache: Borrar caché
+  upload: Subir Translationfile
+
+show_non_translated_only: "Mostrar sólo las teclas que no traducidas"
+
+batch:
+  download: 'descargar'

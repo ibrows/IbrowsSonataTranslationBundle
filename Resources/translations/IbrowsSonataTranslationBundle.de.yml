@@ -6,3 +6,9 @@ translation:
   
 action:
   clear_cache: Cache löschen
+  upload: Translationfile hochladen
+
+show_non_translated_only: "Nur noch nicht übersetzte Felder anzeigen"
+
+batch:
+  download: 'Herunterladen'

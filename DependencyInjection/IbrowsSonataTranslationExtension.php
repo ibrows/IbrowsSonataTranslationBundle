@@ -27,19 +27,26 @@ class IbrowsSonataTranslationExtension extends Extension
 
         $this->registerContainerParametersRecursive($container, $this->getAlias(), $config);
     }
-    
+
+    /**
+     * @param ContainerBuilder $container
+     * @param String $alias
+     * @param array $config
+     */
     protected function registerContainerParametersRecursive(ContainerBuilder $container, $alias, $config)
     {
-	    	$iterator = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($config),
-	    			\RecursiveIteratorIterator::SELF_FIRST);
-	    
-	    	foreach($iterator as $value){
-	    		$path = array( );
-	    		for($i = 0; $i <= $iterator->getDepth(); $i++){
-	    			$path[] = $iterator->getSubIterator($i)->key();
-	    		}
-	    		$key = $alias . '.' . implode(".", $path);
-	    		$container->setParameter($key, $value);
-	    	}
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveArrayIterator($config),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        foreach ($iterator as $value) {
+            $path = array();
+            for ($i = 0; $i <= $iterator->getDepth(); $i++) {
+                $path[] = $iterator->getSubIterator($i)->key();
+            }
+            $key = $alias.'.'.implode(".", $path);
+            $container->setParameter($key, $value);
+        }
     }
 }

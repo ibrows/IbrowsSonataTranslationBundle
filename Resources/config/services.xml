@@ -1,29 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <container xmlns="http://symfony.com/schema/dic/services"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services/services-1.0.xsd">
-    
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
     <services>
-    		<!-- ORM -->
-		<service id="ibrows_sonata_translation.admin.orm" class="Ibrows\SonataTranslationBundle\Admin\ORMTranslationAdmin">
-			<tag name="sonata.admin" manager_type="orm" group="group.translation" label_catalogue="IbrowsSonataTranslationBundle" label="translation.title"/>
-			<argument />
-			<argument>Lexik\Bundle\TranslationBundle\Entity\TransUnit</argument>
-			<argument>IbrowsSonataTranslationBundle:TranslationCRUD</argument>
-			<call method="setEditableOptions">
-				<argument>%ibrows_sonata_translation.editable%</argument>
-			</call>
-			<call method="setTranslationDomain">
-				<argument>IbrowsSonataTranslationBundle</argument>
-			</call>
-			<call method="setTransUnitManager">
-				<argument type="service" id="lexik_translation.trans_unit.manager" />
-			</call>
-			<call method="setManagedLocales">
-				<argument>%lexik_translation.managed_locales%</argument>
-			</call>
-		</service>
-		
-	</services>
+        <!-- ORM -->
+        <service id="ibrows_sonata_translation.admin.orm"
+                 class="Ibrows\SonataTranslationBundle\Admin\ORMTranslationAdmin">
+            <tag name="sonata.admin" manager_type="orm" group="group.translation"
+                 label_catalogue="IbrowsSonataTranslationBundle" label="translation.title"/>
+            <argument/>
+            <argument>Lexik\Bundle\TranslationBundle\Entity\TransUnit</argument>
+            <argument>IbrowsSonataTranslationBundle:TranslationCRUD</argument>
+            <call method="setEditableOptions">
+                <argument>%ibrows_sonata_translation.editable%</argument>
+            </call>
+            <call method="setTranslationDomain">
+                <argument>IbrowsSonataTranslationBundle</argument>
+            </call>
+            <call method="setTransUnitManager">
+                <argument type="service" id="lexik_translation.trans_unit.manager"/>
+            </call>
+            <call method="setManagedLocales">
+                <argument>%lexik_translation.managed_locales%</argument>
+            </call>
+            <call method="setDefaultSelections">
+                <argument>%ibrows_sonata_translation.defaultSelections%</argument>
+            </call>
+            <call method="setEmptyPrefixes">
+                <argument>%ibrows_sonata_translation.emptyPrefixes%</argument>
+            </call>
+        </service>
+
+        <service id="ibrows_sonata_translation.translationfileadmin.orm"
+                 class="Ibrows\SonataTranslationBundle\Admin\TranslationFileAdmin">
+            <tag name="sonata.admin" manager_type="orm"/>
+            <argument/>
+            <argument>Ibrows\SonataTranslationBundle\Entity\TranslationFile</argument>
+            <argument>IbrowsSonataTranslationBundle:TranslationFileCRUD</argument>
+            <call method="setTransUnitManager">
+                <argument type="service" id="lexik_translation.trans_unit.manager"/>
+            </call>
+            <call method="setTranslationStorage">
+                <argument type="service" id="lexik_translation.translation_storage"/>
+            </call>
+            <call method="setManagedLocales">
+                <argument>%lexik_translation.managed_locales%</argument>
+            </call>
+        </service>
+
+    </services>
 </container>
