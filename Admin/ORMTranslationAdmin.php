@@ -31,6 +31,27 @@ class ORMTranslationAdmin extends TranslationAdmin
 
         $filter
             ->add(
+                'locale',
+                'doctrine_orm_callback',
+                array(
+                    'callback' => function (ProxyQuery $queryBuilder, $alias, $field, $options) {
+                        /* @var $queryBuilder \Doctrine\ORM\QueryBuilder */
+                        if (!isset($options['value']) || empty($options['value'])) {
+                            return;
+                        }
+                        // use on to filter locales
+                        $this->joinTranslations($queryBuilder, $alias, $options['value']);
+                    },
+                    'field_options' => array(
+                        'choices' => $this->formatLocales($this->managedLocales),
+                        'required' => false,
+                        'multiple' => true,
+                        'expanded' => false
+                    ),
+                    'field_type' => 'choice',
+                )
+            )
+            ->add(
                 'show_non_translated_only',
                 'doctrine_orm_callback',
                 array
@@ -59,29 +80,6 @@ class ORMTranslationAdmin extends TranslationAdmin
                         'value' => $this->getNonTranslatedOnly(),
                     ),
                     'field_type' => 'checkbox',
-                )
-            )
-            ->add(
-                'locale',
-                'doctrine_orm_callback',
-                array(
-                    'callback' => function (ProxyQuery $queryBuilder, $alias, $field, $options) {
-                        /* @var $queryBuilder \Doctrine\ORM\QueryBuilder */
-                        if (!isset($options['value']) || empty($options['value'])) {
-                            return;
-                        }
-
-                        $this->joinTranslations($queryBuilder, $alias);
-                        $queryBuilder->andWhere('translations.locale IN (:locales)')
-                            ->setParameter('locales', $options['value']);
-                    },
-                    'field_options' => array(
-                        'choices' => $this->formatLocales($this->managedLocales),
-                        'required' => false,
-                        'multiple' => true,
-                        'expanded' => false
-                    ),
-                    'field_type' => 'choice',
                 )
             )
             ->add('key', 'doctrine_orm_string')
@@ -126,7 +124,7 @@ class ORMTranslationAdmin extends TranslationAdmin
      * @param ProxyQuery $queryBuilder
      * @param String $alias
      */
-    private function joinTranslations(ProxyQuery $queryBuilder, $alias)
+    private function joinTranslations(ProxyQuery $queryBuilder, $alias, array $locales = null)
     {
         $alreadyJoined = false;
         $joins = $queryBuilder->getDQLPart('join');
@@ -139,7 +137,13 @@ class ORMTranslationAdmin extends TranslationAdmin
             }
         }
         if (!$alreadyJoined) {
-            $queryBuilder->innerJoin(sprintf('%s.translations', $alias), 'translations');
+            /** @var QueryBuilder $queryBuilder */
+            if($locales){
+                $queryBuilder->leftJoin(sprintf('%s.translations', $alias), 'translations', 'WITH', 'translations.locale = :locales');
+                $queryBuilder->setParameter('locales', $locales);
+            }else{
+                $queryBuilder->leftJoin(sprintf('%s.translations', $alias), 'translations');
+            }
         }
     }
 
