@@ -18,7 +18,7 @@ Add the following lines in your composer.json:
 ```
 
 
-To start using the bundle, register the SonataTranslationBundle and LixikTranslationBundle in your application's kernel class:
+To start using the bundle, register the SonataTranslationBundle and LexikTranslationBundle in your application's kernel class:
 
 ``` 
 <php
