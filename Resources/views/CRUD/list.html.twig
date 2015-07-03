@@ -6,6 +6,5 @@
         {% if admin.hasRoute('create') and admin.isGranted('CREATE')%}
             <li>{% include 'SonataAdminBundle:Core:create_button.html.twig' %}</li>
         {% endif %}
-        <li>{% include 'IbrowsSonataTranslationBundle:Core:upload_file_button.html.twig' %}</li>
     {% endspaceless %}
 {% endblock %}

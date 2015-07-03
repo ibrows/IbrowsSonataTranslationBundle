@@ -33,22 +33,6 @@
             </call>
         </service>
 
-        <service id="ibrows_sonata_translation.translationfileadmin.orm"
-                 class="Ibrows\SonataTranslationBundle\Admin\TranslationFileAdmin">
-            <tag name="sonata.admin" manager_type="orm"/>
-            <argument/>
-            <argument>Ibrows\SonataTranslationBundle\Entity\TranslationFile</argument>
-            <argument>IbrowsSonataTranslationBundle:TranslationFileCRUD</argument>
-            <call method="setTransUnitManager">
-                <argument type="service" id="lexik_translation.trans_unit.manager"/>
-            </call>
-            <call method="setTranslationStorage">
-                <argument type="service" id="lexik_translation.translation_storage"/>
-            </call>
-            <call method="setManagedLocales">
-                <argument>%lexik_translation.managed_locales%</argument>
-            </call>
-        </service>
 
     </services>
 </container>
