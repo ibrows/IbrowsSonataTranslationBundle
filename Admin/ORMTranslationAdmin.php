@@ -139,7 +139,7 @@ class ORMTranslationAdmin extends TranslationAdmin
         if (!$alreadyJoined) {
             /** @var QueryBuilder $queryBuilder */
             if ($locales) {
-                $queryBuilder->leftJoin(sprintf('%s.translations', $alias), 'translations', 'WITH', 'translations.locale = :locales');
+                $queryBuilder->leftJoin(sprintf('%s.translations', $alias), 'translations', 'WITH', 'translations.locale in (:locales)');
                 $queryBuilder->setParameter('locales', $locales);
             } else {
                 $queryBuilder->leftJoin(sprintf('%s.translations', $alias), 'translations');
