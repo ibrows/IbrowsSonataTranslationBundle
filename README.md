@@ -44,11 +44,11 @@ However there are some options you can configure in order to edit the look. Belo
 # app/config/config.yml
 ibrows_sonata_translation:
     defaultDomain: messages
-	editable:
-    	mode: inline		 # Mode of editable, can be popup or inline
-		type: textarea		 # Type of input. Can be text|textarea|select|date|checklist and more
-		emptytext: Empty 	 # text to display on empty translations
-		placement: top		 # ingnored for inline mode
+    editable:
+        mode: inline          # Mode of editable, can be popup or inline
+        type: textarea        # Type of input. Can be text|textarea|select|date|checklist and more
+        emptytext: Empty      # text to display on empty translations
+        placement: top        # ingnored for inline mode
 ```
 
 #### LexikTranslationBundle
