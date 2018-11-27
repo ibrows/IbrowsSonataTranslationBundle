@@ -7,10 +7,10 @@ use Lexik\Bundle\TranslationBundle\Manager\TransUnitManagerInterface;
 use Sonata\AdminBundle\Model\ModelManagerInterface;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
-use Sonata\AdminBundle\Admin\Admin;
+use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-abstract class TranslationAdmin extends Admin
+abstract class TranslationAdmin extends AbstractAdmin
 {
     /**
      * @var TransUnitManagerInterface
